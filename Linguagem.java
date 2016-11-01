@@ -26,6 +26,20 @@ public class Linguagem {
     String padroes[] = {identificador, numero, soma, subtrai, multiplica, divide,
         atribui, abreparentese, fechaparentese, escreva, inicio, fim};
 
+    public String fazerCasamento(String lexema) {
+        boolean b;
+        String token;
+        for (int i = 0; i < padroes.length; i++) {
+            b = lexema.matches(padroes[i]);
+            if (b) {
+                tokens.add(lexema);
+                token = lexema + " - " + nomePadrao(i);
+                return token;
+            } 
+        }
+        return lexema + "-Símbolo não permitido nesta linguagem.";
+    }
+    
     public ArrayList getTokens() {
         return tokens;
     }
