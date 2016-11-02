@@ -15,8 +15,8 @@ public class Linguagem {
     String atribui = "<-";
 
     
-    String abreparentese ="[(]";
-    String fechaparentese = "[)]";
+    String abreparentese ="[(]";//Não foi utilizado na construção do compilador.
+    String fechaparentese = "[)]";//Não foi utilizado na construção do compilador.
 
     String escreva = "35CR3V4";
 
@@ -37,7 +37,7 @@ public class Linguagem {
                 return token;
             } 
         }
-        return lexema + "-Símbolo não permitido nesta linguagem.";
+        return lexema + " - Símbolo não permitido nesta linguagem.";
     }
     
     public ArrayList getTokens() {
@@ -61,9 +61,9 @@ public class Linguagem {
             case 6:
                 return "atribuição";
             case 7:
-                return "separador";
+                return "abre parêntese";
             case 8:
-                return "separador";
+                return "fecha parêntese";
             case 9:
                 return "palavra reservada";
             case 10:
