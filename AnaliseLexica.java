@@ -53,7 +53,35 @@ public class AnaliseLexica {
 //            System.out.println(lexemas.get(i));
 //        }
         System.out.println("***************************************************");
-        //return produzirTokens(lexemas);
-        return null;
+         return produzirTokens(lexemas);
     }
+
+    /**
+     * Este método verifica se cada índice do Array de lexemas existe na linguagem definida por nós.
+     * @param lexemas (ArrayList) com os lexemas encontrados 
+     * @return palavra inexistente na linguagem, caso haja alguma, caso conrário, retorna sucesso.
+     */
+    public String produzirTokens(ArrayList lexemas) {
+        Linguagem linguagem = new Linguagem();
+        String erro = "";
+        String sucesso = "Compilou sem erros";
+        for (int i = 0; i < lexemas.size(); i++) {
+            //System.out.println(linguagem.fazerCasamento(lexemas.get(i).toString()));
+            
+            /*Se não for encontrado na linguagem um padrão que bata com o lexema, 
+            o mesmo é retornado na variável "erro" para ser exibida numa pop-up como mensagem de erro.*/
+            erro = linguagem.fazerCasamento(lexemas.get(i).toString());
+            if (erro.charAt(erro.length() - 1) == '.') {
+                return erro;
+            }
+        }
+        Object tokens[] = linguagem.getTokens().toArray();
+        AnaliseSintatica sintatica = new AnaliseSintatica(tokens);
+        String bug = sintatica.parse();
+        if (bug == null) {
+            return sucesso;
+        }
+        return bug;
     }
+
+}
