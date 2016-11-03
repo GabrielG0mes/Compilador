@@ -78,7 +78,11 @@ public class Interface extends javax.swing.JFrame {
     }// </editor-fold>                        
 
     private void jToggleButton1ActionPerformed(java.awt.event.ActionEvent evt) {                                               
+        String programa = jTextArea1.getText();
+        AnaliseLexica lexica = new AnaliseLexica(programa);
+        String erro = lexica.escandimento();
         
+        JOptionPane.showMessageDialog(rootPane, erro, "Mensagem", HEIGHT);
     }                                              
 
     // Variables declaration - do not modify                     
