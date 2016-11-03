@@ -23,15 +23,25 @@ COMO UTILIZAR O COMPILADOR
 Há duas opções para executar compilador:
   
 Primeira opção:
-	1. Baixar o arquivo Compilador.exe;
-	2. Após um duplo clique no arquivo, aparecerá uma janela;
-	3. Na área de texto que a janela possui, forneça uma cadeia de entrada de acordo com a linguagem especificada acima;
-	4. Ao clicar no botão "Compilar", aparecerá uma pop-up com o resultado da compilação.
+
+1. Baixar o arquivo Compilador.exe;
+
+2. Após um duplo clique no arquivo, aparecerá uma janela;
+
+3. Na área de texto que a janela possui, forneça uma cadeia de entrada de acordo com a linguagem especificada acima;
+
+4. Ao clicar no botão "Compilar", aparecerá uma pop-up com o resultado da compilação.
 
 Segunda opção:
-	1. Baixar o arquivo Compilador.jar;
-	2. Abra o terminal de seu Sistema Operacional;
-	3. Execute o seguinte comando: java -jar "<caminho_completo_do_jar>\Compilador.jar"
-	4. Após executar o comando, aparecerá uma janela;
-	5. Na área de texto que a janela possui, forneça uma cadeia de entrada de acordo com a linguagem especificada acima;
-	6. Ao clicar no botão "Compilar", aparecerá uma pop-up com o resultado da compilação.
+
+1. Baixar o arquivo Compilador.jar;
+
+2. Abra o terminal de seu Sistema Operacional;
+
+3. Execute o seguinte comando: java -jar "caminho_completo_do_jar\Compilador.jar"
+
+4. Após executar o comando, aparecerá uma janela;
+
+5. Na área de texto que a janela possui, forneça uma cadeia de entrada de acordo com a linguagem especificada acima;
+
+6. Ao clicar no botão "Compilar", aparecerá uma pop-up com o resultado da compilação.
