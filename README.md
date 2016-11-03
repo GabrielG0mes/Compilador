@@ -20,7 +20,7 @@
 
 COMO UTILIZAR O COMPILADOR
 
-Há duas opções para executar compilador:
+Há duas opções para executar o compilador:
   
 Primeira opção:
 
