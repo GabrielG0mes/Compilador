@@ -81,7 +81,7 @@ public class Interface extends javax.swing.JFrame {
         AnaliseLexica lexica = new AnaliseLexica(programa);
         String mensagem = lexica.escandimento();
         String arvore = lexica.getArvore();
-        if (mensagem.equals("10")) {
+        if (mensagem.equals("SS")) {
             
             StyledDocument doc = jTextPane1.getStyledDocument();
             SimpleAttributeSet center = new SimpleAttributeSet();
