@@ -105,7 +105,7 @@ public class AnaliseSintatica {
         for (Object terminai : terminais) {
             shift_reduce(terminai.toString());
         }
-        //aplicarPrecedencia(); Criar método precedência
+        aplicarPrecedencia(); 
         for (int i = 0; i < aux.size(); i++) {
             semantica.adicionarGalho1(aux.get(i).toString());
         }
@@ -210,6 +210,31 @@ public class AnaliseSintatica {
         }
     }
     
+    public void aplicarPrecedencia() {
+
+        int ctAdd = 0, ctMult = 0;
+        for (int i = 0; i < aux.size(); i++) {
+            if (aux.get(i).equals("<OP_MUL>")) {
+                ctMult++;
+            }
+            if (aux.get(i).equals("<OP_ADD>")) {
+                ctAdd++;
+            }
+        }
+        for (int i = 0; i < aux.size(); i++) {
+            if (aux.get(i).equals("<OP_ADD>") || aux.get(i).equals("<OP_MUL>")) {
+                if (ctAdd != 0) {
+                    aux.remove(i);
+                    aux.add(i, "<OP_ADD>");
+                    ctAdd--;
+                } else if (ctMult != 0) {
+                    aux.remove(i);
+                    aux.add(i, "<OP_MUL>");
+                    ctMult--;
+                }
+            }
+        }
+    }
      
     /**
      * Faz a derivação seguindo a árvore de parse.
