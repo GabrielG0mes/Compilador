@@ -11,7 +11,7 @@
  * Variáveis devem seguir o padrão # seguido de qualquer palavra com letra maiúscula, minúscula e dígito. 
  * Ex:#compiuter666, #ESPERAMOS, #Receber, #UmA, #b04N0t4.
  * Para efetuar atribuição, utiliza-se "<-". Ex: #ExEmP10 <- (Identificador, número ou operação numérica).
- * Para mostrar algo na tela, utiliza-se "35CR3V4", seguido do que irá ser mostrado. Pode ser número, identificador ou operação numérica (Suporta no máximo 5 operações).
+ * Para mostrar algo na tela, utiliza-se "35CR3V4", seguido do que irá ser mostrado. Pode ser número, identificador ou operação numérica (sem limites).
  * Para realizar operações, utiliza-se os operadores aritméticos: "M415", "M3N05", "V3Z35" e "D1V1D1D0". 
  * As operações podem ser efetuadas entre identificadores, números ou números e identificadores, sem limites.
  * Para atribuições, a mesma regra é válida.
