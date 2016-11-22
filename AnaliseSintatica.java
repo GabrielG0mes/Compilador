@@ -1,88 +1,301 @@
-
 import java.util.ArrayList;
+import java.util.Stack;
 
 /**
  *
- * @autores Gabriel de Sousa Gomes e Nayara Gomes de Oliveira Pereira
+ * @author Gabriel Gomes e Nayara G. de Oliveira
  */
-public class AnaliseLexica {
+public class AnaliseSintatica {
 
     /**
-     * Texto digitado na janela é setado nesta variável.
+     * Vetor que irá armazenar os tokens advindos da análise léxica.
      */
-    private String programa;
+    Object terminais[];
+    /**
+     * Pilha para auxiliar na análise sintatica.
+     */
+    Stack pilha = new Stack();
+    /**
+     * Vetores que irão armazenar a derivação temporariamente.
+     */
+    ArrayList aux = new ArrayList();
+    ArrayList temp = new ArrayList();
+    ArrayList precedencia = new ArrayList();
+    AnaliseSemantica semantica = new AnaliseSemantica();
 
-    AnaliseLexica(String programa) {
-        this.programa = programa;
+    private final String inicial = "<STATEMENT>";
+    
+    private boolean arvore;
+    private String arvoreGerada;
+    /**
+     * Árvore de parse.
+     */
+    private final String regrasProducao[][] = {
+        {"<STATEMENT>", "<ESCREVA>"},
+        {"<STATEMENT>", "<ATRIBUICAO>"},
+        {"<ESCREVA>", "<ID><ESCR>"},
+        {"<ESCREVA>", "<NUM><ESCR>"},
+        {"<ESCREVA>", "<OPERACAO><ESCR>"},
+        {"<ATRIBUICAO>", "<ID><SETA><ID>"},
+        {"<ATRIBUICAO>", "<NUM><SETA><ID>"},
+        {"<ATRIBUICAO>", "<OPERACAO><SETA><ID>"},
+        {"<OPERACAO>", "<ID><OP_ADD><ID>"},
+        {"<OPERACAO>", "<ID><OP_MUL><ID>"},
+        {"<OPERACAO>", "<ID><OP_ADD><NUM>"},
+        {"<OPERACAO>", "<ID><OP_MUL><NUM>"},
+        {"<OPERACAO>", "<NUM><OP_ADD><ID>"},
+        {"<OPERACAO>", "<NUM><OP_MUL><ID>"},
+        {"<OPERACAO>", "<NUM><OP_ADD><NUM>"},
+        {"<OPERACAO>", "<NUM><OP_MUL><NUM>"},
+        {"<OPERACAO>", "<OPERACAO><OP_ADD><ID>"},
+        {"<OPERACAO>", "<OPERACAO><OP_MUL><ID>"},
+        {"<OPERACAO>", "<OPERACAO><OP_ADD><NUM>"},
+        {"<OPERACAO>", "<OPERACAO><OP_MUL><NUM>"},
+        {"<OPERACAO>", "<OPERACAO><OP_ADD><OPERACAO>"},
+        {"<OPERACAO>", "<OPERACAO><OP_MUL><OPERACAO>"},
+        {"<ESCR>", "35CR3V4"},
+        {"<ID>", "#[A-Z|a-z|0-9]+"},
+        {"<NUM>", "[0-9]+"},
+        {"<SETA>", "<-"},
+        {"<OP_ADD>", "M415"},
+        {"<OP_ADD>", "M3N05"},
+        {"<OP_MUL>", "V3Z35"},
+        {"<OP_MUL>", "D1V1D1D0"}
+    };
+
+    /**
+     * Construtor que recebe os tokens e armazena no Array de símbolos
+     * terminais.
+     *
+     * @param tokens
+     */
+    public AnaliseSintatica(Object tokens[]) {
+        terminais = tokens;
+    }
+
+    public String getArvoreGerada() {
+        return arvoreGerada;
+    }
+    
+    
+
+    /**
+     * Efetua o parse dos elementos do vetor "terminais".
+     *
+     * @return mensagem de sucesso ou erro.
+     */
+    public String parse() {
+        /**
+         * Verifica a existência das palavras reservadas "1N1C10" e "F1M" que
+         * delimitam o escopo do algoritmo.
+         */
+        for (int i = 1; i < terminais.length - 1; i++) {
+            semantica.adicionar(terminais[i].toString());
+        }
+        
+        if (!terminais[0].equals("1N1C10")) {
+            return "O programa deve iniciar com '1N1C10'";
+        }
+        if (!terminais[terminais.length - 1].equals("F1M")) {
+            return "O programa deve terminar com 'F1M'";
+        }
+        /**
+         * Para cada símbolo terminal, realiza o "shift-reduce".
+         */
+        for (Object terminai : terminais) {
+            shift_reduce(terminai.toString());
+        }
+        //aplicarPrecedencia(); Criar método precedência
+        for (int i = 0; i < aux.size(); i++) {
+            semantica.adicionarGalho1(aux.get(i).toString());
+        }
+        
+        
+        /**
+         * Faz derivação dos símbolos não terminais obtidos no shift-reduce.
+         */
+        inverteAux();
+
+        for (int i = 0; i < aux.size() * 2; i++) {
+            derivarOperacoes3();
+            aux = temp;
+            if (arvore) {
+                semantica.adicionarGalho2("#");
+                for (int j = aux.size() - 1; j >= 0; j--) {
+                    semantica.adicionarGalho2(aux.get(j).toString());
+                }
+            }
+            temp = new ArrayList();
+        }
+
+        /**
+         * Faz a derivação final para encontrar o símbolo inicial. Caso não seja
+         * encontrado, retorna erro.
+         */
+        for (int i = 0; i < aux.size() * 2; i++) {
+            derivarOperacoes2();
+            aux = temp;
+            if (arvore) {
+                semantica.adicionarGalho3("#");
+                for (int j = aux.size() - 1; j >= 0; j--) {
+                    semantica.adicionarGalho3(aux.get(j).toString());
+                }
+            }
+            temp = new ArrayList();
+        }
+        
+        String erro;
+        for (int i = 0; i < aux.size(); i++) {
+            if (!aux.get(i).equals("<ESCREVA>") && !aux.get(i).equals("<ATRIBUICAO>")) {
+                erro = aux.get(i).toString();
+                return erro(erro);
+            }
+        }
+        
+        semantica.gerarArvore();
+        arvoreGerada = semantica.getArvore();
+        return null;
     }
 
     /**
-     * Este método remove os espaços em branco, quebras de linhas e tabulações
-     * da string "programa".
+     * Efetua o shift-reduce.
      *
-     * @return erro ou sucesso na compilação.
+     * @param s
      */
-    public String escandimento() {
-        programa = programa.replace('\n', ';').replace('\t', ';').replace(' ', ';').replace('\r', ';') + ";";
-        return lexemas();
+    public void shift_reduce(String s) {
+        pilha.push(s);
+        for (String[] regrasProducao1 : regrasProducao) {
+            if (s.matches(regrasProducao1[1])) {
+                pilha.pop();
+                aux.add(regrasProducao1[0]);
+            }
+        }
+    }
+
+    public String shift_reduce(String s1, String s2, String s3) {
+        String s = s1 + s2 + s3;
+        //pilha.push(s);
+        for (String[] regrasProducao1 : regrasProducao) {
+            if (s.matches(regrasProducao1[1])) {
+                //pilha.pop();
+                return regrasProducao1[0];
+            }
+        }
+        return null;
+    }
+
+    public String shift_reduce(String s1, String s2) {
+        String s = s1 + s2;
+        pilha.push(s);
+        for (String[] regrasProducao1 : regrasProducao) {
+            if (s.matches(regrasProducao1[1])) {
+                pilha.pop();
+                return regrasProducao1[0];
+            }
+        }
+        return null;
     }
 
     /**
-     * Este método quebra o texto palavra por palavra.
-     *
-     * @return erro ou sucesso na compilação.
+     * Ordena o vetor auxiliar.
      */
-    public String lexemas() {
-        System.out.println(programa);
+    public void inverteAux() {
+        pilha = new Stack();
+        for (int i = 0; i < aux.size(); i++) {
+            pilha.push(aux.get(i));
+        }
+        aux = new ArrayList();
+        while (!pilha.isEmpty()) {
+            aux.add(pilha.pop());
+        }
+    }
+    
+     
+    /**
+     * Faz a derivação seguindo a árvore de parse.
+     */
+    public void derivarOperacoes3() {
+        
+        String result = null;
 
-        ArrayList lexemas = new ArrayList();
-        String palavra = "";
+        for (int i = 0; i < aux.size(); i++) {
+            try {
+                result = shift_reduce(aux.get(i).toString(), aux.get(i + 1).toString(), aux.get(i + 2).toString());
+            } catch (Exception e) {
 
-        char vetor[] = programa.toCharArray();
-        //Para cada ";" encontrado a string é quebrada e este pedaço é armazenado no ArrayList "lexemas".
-        for (int i = 0; i < vetor.length; i++) {
-            if (vetor[i] != ';') {
-                palavra = palavra + vetor[i];
-                if (vetor[i + 1] == ';') {
-                    lexemas.add(palavra);
-                    palavra = "";
+            }
+            if (result != null) {
+                arvore = true;
+                temp.add(result);
+                i = i + 3;
+                for (int j = i; j < aux.size(); j++) {
+                    temp.add(aux.get(j));
+                }
+                break;
+            } else {
+                arvore = false;
+                try {
+                    temp.add(aux.get(i));
+                } catch (Exception e) {
+
                 }
             }
         }
-
-//        for (int i = 0; i < lexemas.size(); i++) {
-//            System.out.println(lexemas.get(i));
-//        }
-        System.out.println("***************************************************");
-        return produzirTokens(lexemas);
+        //oto.add(aux.get(aux.size() - 1));
     }
 
     /**
-     * Este método verifica se cada índice do Array de lexemas existe na linguagem definida por nós.
-     * @param lexemas (ArrayList) com os lexemas encontrados 
-     * @return palavra inexistente na linguagem, caso haja alguma, caso conrário, retorna sucesso.
+     * Faz a derivação seguindo a árvore de parse.
      */
-    public String produzirTokens(ArrayList lexemas) {
-        Linguagem linguagem = new Linguagem();
-        String erro = "";
-        String sucesso = "Compilou sem erros";
-        for (int i = 0; i < lexemas.size(); i++) {
-            //System.out.println(linguagem.fazerCasamento(lexemas.get(i).toString()));
+    public void derivarOperacoes2() {
+        
+        String result = null;
+
+        for (int i = 0; i < aux.size(); i++) {
+            try {
+                result = shift_reduce(aux.get(i).toString(), aux.get(i + 1).toString());
+            } catch (Exception e) {
+
+            }
+            if (result != null) {
+                arvore = true;
+                temp.add(result);
+                i = i + 2;
+                for (int j = i; j < aux.size(); j++) {
+                    temp.add(aux.get(j));
+                }
+                break;
+            } else {
+                arvore = false;
+                try {
+                    //System.out.println("o null: " + aux.get(i));
+                    temp.add(aux.get(i));
+                } catch (Exception e) {
+
+                }
+            }
             
-            /*Se não for encontrado na linguagem um padrão que bata com o lexema, 
-            o mesmo é retornado na variável "erro" para ser exibida numa pop-up como mensagem de erro.*/
-            erro = linguagem.fazerCasamento(lexemas.get(i).toString());
-            if (erro.charAt(erro.length() - 1) == '.') {
-                return erro;
+        }
+    }
+    
+    public String erro(String s) {
+        switch (s) {
+            case "<ESCR>":
+                return "Falta um número ou identificador  após '35CR3V4'";
+            case "<ID>":
+                return "Indentificador fora de '35CR3V4', sem atribuição ou fora de operação";
+            case "<NUM>":
+                return "Número fora de '35CR3V4', sem atribuição ou fora de operação";
+            case "<OPERACAO>":
+                return "Operação não atribuida a nenhum valor";
+            case "<OP_ADD>": {
+                return "Há operador sem operando";
+            }
+            case "<OP_MUL>": {
+                return "Há operador sem operando";
             }
         }
-        Object tokens[] = linguagem.getTokens().toArray();
-        AnaliseSintatica sintatica = new AnaliseSintatica(tokens);
-        String bug = sintatica.parse();
-        if (bug == null) {
-            return sucesso;
-        }
-        return bug;
+        return "Erro";
     }
 
 }
