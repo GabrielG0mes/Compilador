@@ -1,3 +1,4 @@
+
 import java.util.ArrayList;
 
 /**
@@ -10,9 +11,18 @@ public class AnaliseLexica {
      * Texto digitado na janela é setado nesta variável.
      */
     private String programa;
+    
+    /**
+     * Esta variável irá trazer a árvore gerada pela analise sintática.
+     */
+    private String arvore;
 
     AnaliseLexica(String programa) {
         this.programa = programa;
+    }
+
+    public String getArvore() {
+        return arvore;
     }
 
     /**
@@ -32,8 +42,6 @@ public class AnaliseLexica {
      * @return erro ou sucesso na compilação.
      */
     public String lexemas() {
-        System.out.println(programa);
-
         ArrayList lexemas = new ArrayList();
         String palavra = "";
 
@@ -48,12 +56,7 @@ public class AnaliseLexica {
                 }
             }
         }
-
-//        for (int i = 0; i < lexemas.size(); i++) {
-//            System.out.println(lexemas.get(i));
-//        }
-        System.out.println("***************************************************");
-         return produzirTokens(lexemas);
+        return produzirTokens(lexemas);
     }
 
     /**
@@ -63,8 +66,8 @@ public class AnaliseLexica {
      */
     public String produzirTokens(ArrayList lexemas) {
         Linguagem linguagem = new Linguagem();
-        String erro = "";
-        String sucesso = "Compilou sem erros";
+        String erro;
+        String sucesso = "SS";
         for (int i = 0; i < lexemas.size(); i++) {
             //System.out.println(linguagem.fazerCasamento(lexemas.get(i).toString()));
             
@@ -77,7 +80,9 @@ public class AnaliseLexica {
         }
         Object tokens[] = linguagem.getTokens().toArray();
         AnaliseSintatica sintatica = new AnaliseSintatica(tokens);
+        
         String bug = sintatica.parse();
+        arvore = sintatica.getArvoreGerada();
         if (bug == null) {
             return sucesso;
         }
